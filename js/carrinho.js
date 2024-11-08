@@ -1,44 +1,28 @@
-
 let carrinho = [];
 
-
+// Função para adicionar itens ao carrinho
 function adicionarAoCarrinho(nome, preco, imagem) {
-
     const item = { nome, preco, imagem };
-
-
     carrinho.push(item);
-
-
     console.log('Produto adicionado ao carrinho:', item);
-
-
     alert(`${nome} foi adicionado ao carrinho!`);
 }
 
-
+// Função para exibir o carrinho em um modal (iframe)
 function injectCarrinho(event) {
-    event.preventDefault(); 
+    if (event) event.preventDefault();
 
-  
-    iframeModal.style.display = 'flex';  
+    iframeModal.style.display = 'flex';
     iframeContainer.style.display = 'block';
-
-
-    iframeContainer.innerHTML = '';  
-
+    iframeContainer.innerHTML = '';
 
     const iframe = document.createElement('iframe');
     iframe.width = '100%';
     iframe.height = '400';
-
-
     iframeContainer.appendChild(iframe);
 
- 
     const iframeDocument = iframe.contentWindow.document;
 
-  
     iframeDocument.open();
     iframeDocument.write(`
         <html>
@@ -71,22 +55,32 @@ function injectCarrinho(event) {
                         color: #4CAF50;
                     }
                     .limpar-carrinho {
-                        text-align: center;
+                        display: block;
+                        width: 100%;
+                        padding: 10px;
                         margin-top: 20px;
-                        color: red;
+                        background-color: red;
+                        color: white;
+                        border: none;
                         cursor: pointer;
+                        border-radius: 5px;
+                        font-size: 16px;
+                    }
+                    .limpar-carrinho:hover {
+                        background-color: #cc0000;
                     }
                 </style>
             </head>
             <body>
                 <h2>Seu Carrinho de Compras</h2>
-                <div id="itens-carrinho"></div>
-                <div class="limpar-carrinho" onclick="limparCarrinho()">Limpar Carrinho</div>
+                <div id="itens-carrinho">
+                    ${carrinho.length === 0 ? '<p>O carrinho está vazio.</p>' : ''}
+                </div>
+                <button class="limpar-carrinho" onclick="window.parent.limparCarrinho()">Limpar Carrinho</button>
             </body>
         </html>
     `);
     iframeDocument.close();
-
 
     const itensContainer = iframeDocument.getElementById('itens-carrinho');
     carrinho.forEach(item => {
@@ -104,11 +98,15 @@ function injectCarrinho(event) {
     });
 }
 
-
+// Função para limpar o carrinho, fechar o modal e atualizar o conteúdo do iframe
 function limparCarrinho() {
     carrinho = [];
     alert('Carrinho limpo!');
-    injectCarrinho(); 
+
+    // Fecha o modal imediatamente após a limpeza
+    iframeModal.style.display = 'none';
+    iframeContainer.style.display = 'none';
+    iframeContainer.innerHTML = '';
 }
 
 const liInject = document.getElementById('injetaiframe');
@@ -117,12 +115,11 @@ const iframeContainer = document.getElementById('iframe-container');
 
 liInject.addEventListener('click', injectCarrinho);
 
-
+// Fechar o modal ao clicar fora do iframe
 iframeModal.addEventListener('click', function (event) {
-  
     if (event.target === iframeModal) {
-        iframeModal.style.display = 'none';  
-        iframeContainer.style.display = 'none';  
-        iframeContainer.innerHTML = '';  
+        iframeModal.style.display = 'none';
+        iframeContainer.style.display = 'none';
+        iframeContainer.innerHTML = '';
     }
 });
